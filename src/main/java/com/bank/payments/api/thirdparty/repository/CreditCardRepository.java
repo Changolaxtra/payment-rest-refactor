@@ -25,7 +25,7 @@ public class CreditCardRepository implements BankRepository<CreditCard, String> 
 
   @Override
   public CreditCard save(final CreditCard creditCard) {
-    log.info("Saving {}", creditCard);
+    log.info("Saving Card: {}", creditCard);
     validateCardForSave(creditCard);
     numberToCreditCard.put(creditCard.number(),
         new CreditCard(creditCard.number(),
@@ -36,14 +36,14 @@ public class CreditCardRepository implements BankRepository<CreditCard, String> 
 
   @Override
   public CreditCard find(final String cardNumber) {
-    log.info("Searching {}", cardNumber);
+    log.info("Searching Card: {}", cardNumber);
     validateExistence(cardNumber);
     return numberToCreditCard.get(cardNumber);
   }
 
   @Override
   public CreditCard update(final CreditCard updatedCard) {
-    log.info("Updating {}", updatedCard);
+    log.info("Updating Card: {}", updatedCard);
     validateCardForUpdate(updatedCard);
     numberToCreditCard.put(updatedCard.number(),
         new CreditCard(updatedCard.number(),
@@ -54,8 +54,15 @@ public class CreditCardRepository implements BankRepository<CreditCard, String> 
   }
 
   @Override
+  public void remove(String cardNumber) {
+    log.info("Removing Card: {}", cardNumber);
+    validateExistence(cardNumber);
+    numberToCreditCard.remove(cardNumber);
+  }
+
+  @Override
   public boolean exists(final String cardNumber) {
-    log.info("Exists? {}", cardNumber);
+    log.info("Checking if {} card exists.", cardNumber);
     if (StringUtils.isEmpty(cardNumber)) {
       throw new BankRepositoryException(ErrorMessage.INVALID_CARD_NUMBER);
     }

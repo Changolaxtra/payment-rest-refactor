@@ -7,6 +7,7 @@ public interface BankRepository<T, K> {
   T find(K key);
 
   T update(T entity);
+  void remove(K key);
 
   boolean exists(K key);
 }

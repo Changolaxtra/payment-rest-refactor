@@ -1,20 +1,21 @@
 package com.bank.payments.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.bank.payments.api.base.BaseJsonApiTest;
 import com.bank.payments.api.dto.CardPaymentRequest;
 import com.bank.payments.api.dto.CardPaymentResponse;
 import com.bank.payments.api.model.CreditCard;
 import com.bank.payments.api.thirdparty.repository.CreditCardRepository;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PaymentApiTest extends BaseJsonApiTest {
 
@@ -29,43 +30,61 @@ public class PaymentApiTest extends BaseJsonApiTest {
   @Autowired
   private CreditCardRepository creditCardRepository;
 
-  @Disabled
-  @Test
-  public void createCreditCardAndMakePayment() throws Exception {
-    //Arrange
+  @BeforeEach
+  @Override
+  public void setUp() {
+    super.setUp();
     setupCreditCard();
+  }
 
-    // Process payment with wrong cvv, should return Successful=false
-    final CardPaymentResponse paymentResponse1 = makePayment(CARD_NUMBER, WRONG_CVV,
-        new BigDecimal(100));
-    assertFalse(paymentResponse1.isSuccessful());
+  @AfterEach
+  public void afterEach() {
+    creditCardRepository.remove(CARD_NUMBER);
+  }
 
-    // Process payment with correct cvv and enough balance, should return Successful=true
-    final CardPaymentResponse paymentResponse2 = makePayment(CARD_NUMBER, CVV, new BigDecimal(700));
-    assertTrue(paymentResponse2.isSuccessful());
-    assertEquals(new BigDecimal(300), paymentResponse2.getBalance());
+  @Test
+  public void givenWrongCvvForPaymentShouldBeUnsuccessful() throws Exception {
+    final BigDecimal amount = new BigDecimal(100);
+    final CardPaymentResponse response = makePayment(CARD_NUMBER, WRONG_CVV, amount);
 
-    // Process payment with correct cvv and not enough balance, should return Successful=false
-    final CardPaymentResponse paymentResponse3 = makePayment(CARD_NUMBER, CVV, new BigDecimal(500));
-    assertFalse(paymentResponse3.isSuccessful());
+    assertFalse(response.isSuccessful());
+  }
 
-    // Process payment with wrong card, should return Successful=false
-    final CardPaymentResponse paymentResponse4 = makePayment(INVALID_CARD_NUMBER, CVV,
-        BigDecimal.ONE);
-    assertFalse(paymentResponse4.isSuccessful());
+  @Test
+  public void givenCorrectCardForPaymentShouldBeSuccessfulWithCorrectBalance() throws Exception {
+    final BigDecimal amount = new BigDecimal(700);
+    final CardPaymentResponse response = makePayment(CARD_NUMBER, CVV, amount);
+    assertTrue(response.isSuccessful());
 
-    // Process payment with correct cvv and negative balance, should return Successful=false
-    final CardPaymentResponse paymentResponse5 = makePayment(CARD_NUMBER, CVV,
-        new BigDecimal(10).negate());
-    assertFalse(paymentResponse5.isSuccessful());
+    assertEquals(new BigDecimal(300), response.getBalance());
+  }
+
+  @Test
+  public void givenGreaterAmountThanBalanceForPaymentShouldBeUnsuccessful() throws Exception {
+    final BigDecimal amount = new BigDecimal(1500);
+    final CardPaymentResponse response = makePayment(CARD_NUMBER, CVV,
+        amount);
+
+    assertFalse(response.isSuccessful());
+  }
+
+  @Test
+  public void givenWrongCardForPaymentShouldBeUnsuccessful() throws Exception {
+    final CardPaymentResponse response = makePayment(INVALID_CARD_NUMBER, CVV, BigDecimal.ONE);
+    assertFalse(response.isSuccessful());
+  }
+
+  @Test
+  public void givenNegativeAmountForPaymentShouldBeUnsuccessful() throws Exception {
+    final BigDecimal amount = new BigDecimal(10).negate();
+    final CardPaymentResponse response = makePayment(CARD_NUMBER, CVV,
+        amount);
+    assertFalse(response.isSuccessful());
   }
 
   private void setupCreditCard() {
     final CreditCard creditCard = createCardWith1000Balance();
     assertNotNull(creditCard);
-    assertEquals(CARD_NUMBER, creditCard.number());
-    assertEquals(CVV, creditCard.cvv());
-    assertEquals(BALANCE, creditCard.balance());
   }
 
   private CreditCard createCardWith1000Balance() {

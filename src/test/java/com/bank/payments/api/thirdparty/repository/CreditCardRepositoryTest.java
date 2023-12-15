@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -68,6 +69,14 @@ class CreditCardRepositoryTest {
     }
 
     @Test
+    public void givenExistentCardNumberAndRemovingItExistsShouldReturnFalse() {
+        repository.remove(CARD_NUMBER);
+        final boolean exists = repository.exists(CARD_NUMBER);
+
+        assertFalse(exists);
+    }
+
+    @Test
     public void givenNonexistentCardNumberAndUpdatingItShouldThrowException() {
         Exception exception = assertThrows(BankRepositoryException.class, () -> {
             repository.update(new CreditCard(CARD_NUMBER2, 123, new BigDecimal(600)));
@@ -107,4 +116,6 @@ class CreditCardRepositoryTest {
         assertNotNull(exception);
         assertEquals(ErrorMessage.INVALID_CARD_NUMBER, exception.getMessage());
     }
+
+
 }
