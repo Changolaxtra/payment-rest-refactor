@@ -13,16 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CreditCardRepositoryTest {
+class InMemoryCreditCardRepositoryTest {
 
     private static final String CARD_NUMBER = "1111222233334444";
     private static final String CARD_NUMBER2 = "1111222233335555";
 
-    private CreditCardRepository repository;
+    private InMemoryCreditCardRepository repository;
 
     @BeforeEach
     void setUp() throws BankRepositoryException {
-        repository = new CreditCardRepository();
+        repository = new InMemoryCreditCardRepository();
         repository.init();
         repository.save(new CreditCard(CARD_NUMBER, 123, new BigDecimal(500)));
     }

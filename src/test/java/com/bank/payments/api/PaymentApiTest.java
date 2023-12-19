@@ -12,7 +12,6 @@ import com.bank.payments.api.model.CreditCard;
 import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.bank.payments.api.thirdparty.repository.CreditCardRepository;
 import java.math.BigDecimal;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,6 +79,12 @@ public class PaymentApiTest extends BaseJsonApiTest {
     final BigDecimal amount = new BigDecimal(10).negate();
     final CardPaymentResponse response = makePayment(CARD_NUMBER, CVV,
         amount);
+    assertFalse(response.isSuccessful());
+  }
+
+  @Test
+  public void givenNullAmountForPaymentShouldBeUnsuccessful() throws Exception {
+    final CardPaymentResponse response = makePayment(CARD_NUMBER, CVV, null);
     assertFalse(response.isSuccessful());
   }
 

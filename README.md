@@ -3,7 +3,8 @@ This is a simple project to create a REST API to process payments, used as an in
 
 
 ## Instructions
-Refactor the functionality of the Payments API (`CardPaymentController`), trying to follow clean code and best practices that you know.
+- Refactor the functionality of the Payments API (`CardPaymentController`), trying to follow clean code and best practices that you know.
+- It is important to improve the error message in the response.
 
 ### Test
 
