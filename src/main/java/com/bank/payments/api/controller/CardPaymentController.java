@@ -39,12 +39,12 @@ public class CardPaymentController {
         }
 
         // Verifying if enough balance.
-        if(request.getAmount()!=null) {
+        if (request.getAmount() != null) {
           if (request.getAmount().compareTo(creditCard.balance()) > 0) {
             log.error("Incorrect Balance");
             return CardPaymentResponse.builder().message("error").successful(false).build();
           }
-        }else{
+        } else {
           log.error("Incorrect Amount");
           return CardPaymentResponse.builder().message("error").successful(false).build();
         }
