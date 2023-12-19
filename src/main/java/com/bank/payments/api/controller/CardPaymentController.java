@@ -3,6 +3,7 @@ package com.bank.payments.api.controller;
 import com.bank.payments.api.dto.CardPaymentRequest;
 import com.bank.payments.api.dto.CardPaymentResponse;
 import com.bank.payments.api.model.CreditCard;
+import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.bank.payments.api.thirdparty.repository.CreditCardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,35 +27,40 @@ public class CardPaymentController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public CardPaymentResponse process(@RequestBody final CardPaymentRequest request) {
-    // Verify if card exists.
-    if (creditCardRepository.exists(request.getNumber())) {
-      CreditCard creditCard = creditCardRepository.find(request.getNumber());
 
-      // Verifying CVV
-      if (!creditCard.cvv().equals(request.getCvv())) {
+    try {
+      // Verify if card exists.
+      if (creditCardRepository.exists(request.getNumber())) {
+        CreditCard creditCard = creditCardRepository.find(request.getNumber());
+
+        // Verifying CVV
+        if (!creditCard.cvv().equals(request.getCvv())) {
+          return CardPaymentResponse.builder().message("error").successful(false).build();
+        }
+
+        // Verifying if enough balance.
+        if (request.getAmount().compareTo(creditCard.balance()) > 0) {
+          return CardPaymentResponse.builder().message("error").successful(false).build();
+        }
+
+        // Verifying if payment amount is negative
+        if (request.getAmount().signum() == -1) {
+          return CardPaymentResponse.builder().message("error").successful(false).build();
+        }
+
+        // Updating Card with new amount.
+        CreditCard update = creditCardRepository.update(
+            new CreditCard(creditCard.number(), creditCard.cvv(),
+                creditCard.balance().add(request.getAmount().negate())));
+
+        // Returning good response.
+        return CardPaymentResponse.builder().successful(true).balance(update.balance()).build();
+
+      } else {
+        // If Card does not exist.
         return CardPaymentResponse.builder().message("error").successful(false).build();
       }
-
-      // Verifying if enough balance.
-      if (request.getAmount().compareTo(creditCard.balance()) > 0) {
-        return CardPaymentResponse.builder().message("error").successful(false).build();
-      }
-
-      // Verifying if payment amount is negative
-      if (request.getAmount().signum() == -1) {
-        return CardPaymentResponse.builder().message("error").successful(false).build();
-      }
-
-      // Updating Card with new amount.
-      CreditCard update = creditCardRepository.update(
-          new CreditCard(creditCard.number(), creditCard.cvv(),
-              creditCard.balance().add(request.getAmount().negate())));
-
-      // Returning good response.
-      return CardPaymentResponse.builder().successful(true).balance(update.balance()).build();
-
-    } else {
-      // If Card does not exist.
+    } catch (Exception e) {
       return CardPaymentResponse.builder().message("error").successful(false).build();
     }
   }

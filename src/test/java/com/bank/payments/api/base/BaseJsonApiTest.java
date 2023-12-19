@@ -1,5 +1,6 @@
 package com.bank.payments.api.base;
 
+import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,7 +26,7 @@ public class BaseJsonApiTest {
   private WebApplicationContext webApplicationContext;
 
   @BeforeEach
-  public void setUp() {
+  public void setUp() throws BankRepositoryException {
     mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
   }
 

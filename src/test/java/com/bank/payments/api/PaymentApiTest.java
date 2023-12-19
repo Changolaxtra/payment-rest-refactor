@@ -9,6 +9,7 @@ import com.bank.payments.api.base.BaseJsonApiTest;
 import com.bank.payments.api.dto.CardPaymentRequest;
 import com.bank.payments.api.dto.CardPaymentResponse;
 import com.bank.payments.api.model.CreditCard;
+import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.bank.payments.api.thirdparty.repository.CreditCardRepository;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.AfterAll;
@@ -32,13 +33,13 @@ public class PaymentApiTest extends BaseJsonApiTest {
 
   @BeforeEach
   @Override
-  public void setUp() {
+  public void setUp() throws BankRepositoryException {
     super.setUp();
     setupCreditCard();
   }
 
   @AfterEach
-  public void afterEach() {
+  public void afterEach() throws BankRepositoryException {
     creditCardRepository.remove(CARD_NUMBER);
   }
 
@@ -82,12 +83,12 @@ public class PaymentApiTest extends BaseJsonApiTest {
     assertFalse(response.isSuccessful());
   }
 
-  private void setupCreditCard() {
+  private void setupCreditCard() throws BankRepositoryException {
     final CreditCard creditCard = createCardWith1000Balance();
     assertNotNull(creditCard);
   }
 
-  private CreditCard createCardWith1000Balance() {
+  private CreditCard createCardWith1000Balance() throws BankRepositoryException {
     return creditCardRepository
         .save(new CreditCard(PaymentApiTest.CARD_NUMBER,
             PaymentApiTest.CVV,
