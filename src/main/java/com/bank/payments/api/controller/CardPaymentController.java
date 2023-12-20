@@ -2,7 +2,7 @@ package com.bank.payments.api.controller;
 
 import com.bank.payments.api.dto.CardPaymentRequest;
 import com.bank.payments.api.dto.CardPaymentResponse;
-import com.bank.payments.api.model.CreditCard;
+import com.bank.payments.api.thirdparty.model.CreditCard;
 import com.bank.payments.api.thirdparty.repository.InMemoryCreditCardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class CardPaymentController {
         // If Card does not exist.
         return CardPaymentResponse.builder().message("error").successful(false).build();
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       log.error("E: ", e);
       return CardPaymentResponse.builder().message("error").successful(false).build();
     }

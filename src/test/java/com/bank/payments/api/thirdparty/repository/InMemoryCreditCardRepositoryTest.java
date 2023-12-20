@@ -1,6 +1,6 @@
 package com.bank.payments.api.thirdparty.repository;
 
-import com.bank.payments.api.model.CreditCard;
+import com.bank.payments.api.thirdparty.model.CreditCard;
 import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.bank.payments.api.thirdparty.exception.ErrorMessage;
 import org.junit.jupiter.api.BeforeEach;

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.bank.payments.api.base.BaseJsonApiTest;
 import com.bank.payments.api.dto.CardPaymentRequest;
 import com.bank.payments.api.dto.CardPaymentResponse;
-import com.bank.payments.api.model.CreditCard;
+import com.bank.payments.api.thirdparty.model.CreditCard;
 import com.bank.payments.api.thirdparty.exception.BankRepositoryException;
 import com.bank.payments.api.thirdparty.repository.CreditCardRepository;
 import java.math.BigDecimal;

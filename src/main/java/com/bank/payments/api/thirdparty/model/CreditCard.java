@@ -1,4 +1,4 @@
-package com.bank.payments.api.model;
+package com.bank.payments.api.thirdparty.model;
 
 import java.math.BigDecimal;
 
